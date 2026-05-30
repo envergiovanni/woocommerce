@@ -30,12 +30,12 @@ services:
     ports:
       - "80:80" # Railway mapeará automáticamente el puerto 80 para darte la URL SSL
     volumes:
-      - wordpress:/var/www/html
+      - wordpress_uploads:/var/www/html/wp-content/uploads
     networks:
       - app-network
 
 volumes:
-  wordpress:
+  wordpress_uploads:
   dbdata:
 
 networks:
