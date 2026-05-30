@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+    volumes:
+      - dbdata:/var/lib/mysql
+    # Eliminamos container_name ya que Railway asigna nombres internos dinámicos
+    # Mantén el comando si tu versión de MySQL lo requiere para la conexión de WP
+    command: '--default-authentication-plugin=mysql_native_password'
+    networks:
+      - app-network
+
+  wordpress:
+    depends_on:
+      - db
+    # Cambiamos a la versión Apache (elimina la necesidad de un Nginx aparte)
+    image: wordpress:latest
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      - WORDPRESS_DB_HOST=db:3306
+      - WORDPRESS_DB_USER=${MYSQL_USER}
+      - WORDPRESS_DB_PASSWORD=${MYSQL_PASSWORD}
+      - WORDPRESS_DB_NAME=wordpress
+    ports:
+      - "80:80" # Railway mapeará automáticamente el puerto 80 para darte la URL SSL
+    volumes:
+      - wordpress_uploads:/var/www/html/wp-content/uploads
+    networks:
+      - app-network
+    command: >
+      bash -c "
+      a2dismod mpm_event 2>/dev/null || true;
+      a2dismod mpm_worker 2>/dev/null || true;
+      a2enmod mpm_prefork 2>/dev/null || true;
+      exec docker-entrypoint.sh apache2-foreground"
+
+volumes:
+  wordpress_uploads:
+  dbdata:
+
+networks:
+  app-network:
+    driver: bridge
