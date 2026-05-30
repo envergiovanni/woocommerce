@@ -21,7 +21,7 @@ services:
     depends_on:
       - db
     # Cambiamos a la versión Apache (elimina la necesidad de un Nginx aparte)
-    image: wordpress:latest
+    image: wordpress:php8.2-apache
     restart: unless-stopped
     env_file: .env
     environment:
