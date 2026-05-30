@@ -8,3 +8,5 @@ RUN chmod +x /usr/local/bin/custom-entrypoint.sh
 
 # Definir el entrypoint
 ENTRYPOINT ["/bin/bash", "/usr/local/bin/custom-entrypoint.sh"]
+
+CMD ["apache2-foreground"]
