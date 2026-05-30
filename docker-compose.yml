@@ -33,6 +33,12 @@ services:
       - wordpress_uploads:/var/www/html/wp-content/uploads
     networks:
       - app-network
+    command: >
+      bash -c "
+      a2dismod mpm_event 2>/dev/null || true;
+      a2dismod mpm_worker 2>/dev/null || true;
+      a2enmod mpm_prefork 2>/dev/null || true;
+      exec docker-entrypoint.sh apache2-foreground"
 
 volumes:
   wordpress_uploads:
